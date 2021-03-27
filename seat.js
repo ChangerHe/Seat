@@ -1,3 +1,5 @@
+const { TOTAL_AREA, TOTAL_ROW, BACK_SEAT_NUM } = require("./constants");
+
 class Seat {
   static getInstance() {
     let seat;
@@ -8,9 +10,26 @@ class Seat {
 
   #seatMap = [];
   constructor() {
-    // this.#seatMap =
+    this.#seatMap = new Array(TOTAL_AREA).fill([]).map((v, i) => {
+      return new Array(TOTAL_ROW).fill([]).map((v, i) => {
+        return new Array(BACK_SEAT_NUM).fill(
+          0,
+          TOTAL_ROW - i - 1,
+          BACK_SEAT_NUM - TOTAL_ROW + i + 1
+        );
+      });
+    });
+  }
+
+  showMap(area) {
+    return this.mapToString(this.#seatMap[area]);
+  }
+
+  mapToString(map) {
+    return map.reduce((p, v) => {
+      return `${p}${v.join('')}\n`
+    }, '')
   }
 }
-console.log(Seat.getInstance(), 'Seat.getInstance()')
 
-module.exports = Seat.getInstance();
+module.exports = Seat.getInstance()();
