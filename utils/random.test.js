@@ -10,7 +10,7 @@ describe("check random max limiting case", () => {
     expect(random(5, 10)).toEqual(10);
     expect(randomArea()).toEqual(TOTAL_AREA - 1);
     expect(randomRow()).toEqual(TOTAL_ROW - 1);
-    expect(randomSeat()).toEqual({ area: TOTAL_AREA - 1, seat: [ TOTAL_ROW - 1, BACK_SEAT_NUM - 1 ] });
+    expect(randomSeat()).toEqual([ TOTAL_AREA - 1, TOTAL_ROW - 1, BACK_SEAT_NUM - 1 ]);
   });
   afterEach(() => {
     jest.spyOn(global.Math, "random").mockRestore();
@@ -26,7 +26,7 @@ describe("check random min limiting case", () => {
     expect(random(5, 10)).toEqual(5);
     expect(randomArea()).toEqual(0);
     expect(randomRow()).toEqual(0);
-    expect(randomSeat()).toEqual({ area: 0, seat: [ 0, 25 ] });
+    expect(randomSeat()).toEqual([ 0, 0, 25 ]);
   });
   afterEach(() => {
     jest.spyOn(global.Math, "random").mockRestore();

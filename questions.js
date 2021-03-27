@@ -1,4 +1,5 @@
 const inquirer = require("inquirer");
+const { SINGLE_MAX_TICKET_MUM } = require("./constants");
 
 // 选择区域
 const WHICH_AREA_OPTIONS = {
@@ -31,8 +32,8 @@ const howManyUser = async () => {
     {
       type: "number",
       name: "userNum",
-      message: "请输入要进入购票的用户数量(每位用户购买1-5张)",
-      default: 10,
+      message: `请输入要进入购票的用户数量(每位用户购买1-${SINGLE_MAX_TICKET_MUM}张)`,
+      default: 100,
     },
   ]);
   return answer.userNum;

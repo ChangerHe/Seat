@@ -12,10 +12,7 @@ const randomRow = () => random(0, TOTAL_ROW - 1);
 const randomSeat = () => {
   const rdmRow = randomRow();
   const emptyNum = TOTAL_ROW - rdmRow;
-  return {
-    area: randomArea(),
-    seat: [rdmRow, random(emptyNum, BACK_SEAT_NUM - emptyNum)],
-  };
+  return [randomArea(), rdmRow, random(emptyNum, BACK_SEAT_NUM - emptyNum)]
 };
 
 const randomPeople = () => random(1, SINGLE_MAX_TICKET_MUM);
