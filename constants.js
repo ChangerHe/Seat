@@ -7,14 +7,11 @@ const SEAT_STEP_ADD = 2;
 // 总排数
 const TOTAL_ROW = (BACK_SEAT_NUM - FRONT_SEAT_NUM) / SEAT_STEP_ADD + 1;
 // 总区域
-const AREA_MAP = {
-  A: "A",
-  B: "B",
-  C: "C",
-  D: "D",
-};
+const AREA_ARR = ['A', 'B', 'C', 'D']
 // 总区域数
-const TOTAL_AREA = Object.keys(AREA_MAP).length;
+const TOTAL_AREA = AREA_ARR.length;
+// 单次最大购票数量
+const SINGLE_MAX_TICKET_MUM = 5;
 
 module.exports = {
   FRONT_SEAT_NUM,
@@ -22,5 +19,6 @@ module.exports = {
   SEAT_STEP_ADD,
   TOTAL_ROW,
   TOTAL_AREA,
-  AREA_MAP,
+  AREA_ARR,
+  SINGLE_MAX_TICKET_MUM,
 };

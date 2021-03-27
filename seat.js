@@ -4,7 +4,7 @@ class Seat {
   static getInstance() {
     let seat;
     return () => {
-      return seat || new Seat();
+      return seat || (seat = new Seat());
     };
   }
 
@@ -22,7 +22,7 @@ class Seat {
   }
 
   showMap(area) {
-    return this.mapToString(this.#seatMap[area]);
+    console.log(this.mapToString(this.#seatMap[area]));
   }
 
   mapToString(map) {
