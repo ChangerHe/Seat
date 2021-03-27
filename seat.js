@@ -12,6 +12,8 @@ class Seat {
   }
 
   #seatMap = [];
+  #sellingArea = [0, 1, 2, 3];
+  #searchedSet = new Set();
   constructor() {
     logger.info("empty seats had been generated.");
     this.#seatMap = new Array(TOTAL_AREA).fill([]).map((v, i) => {
@@ -47,11 +49,20 @@ class Seat {
       );
       this.#seatMap[rSeat[0]][rSeat[1]][rSeat[2]] = 1;
     } else {
-      this.reGenSeatByBFS(rSeat);
-      // TODO: toggle area
+      if (!this.reGenSeatByBFS(rSeat)) {
+        this.#sellingArea = this.#sellingArea.filter((v) => v !== rSeat[0]);
+        if (this.#sellingArea.length) {
+          this.outputTicket([
+            this.#sellingArea[0],
+            ~~(TOTAL_ROW / 2),
+            ~~(BACK_SEAT_NUM / 2),
+          ]);
+        } else {
+          logger.info("票已售完");
+        }
+      }
     }
   }
-
   // 买票, 单次票数量1-5张, 座位尽量安排在一起
   buyTicket(rPeople) {
     if (this.checkAllSoldOut()) {
@@ -71,30 +82,32 @@ class Seat {
     const closestPoints = this.getClosestPoint(rArea, rPoint);
     let isFounded = false;
     if (closestPoints.length) {
-      for (let i = 0; i < closestPoints.length; i++) {
+      loop: for (let i = 0; i < closestPoints.length; i++) {
         const point = closestPoints[i];
         if (this.forSaleCheck(rArea, point)) {
           this.#seatMap[rArea][point[0]][point[1]] = 1;
           logger.info(
             `已售出: ${AREA_ARR[rArea]}区域的 ${point[0] + 1}排, ${
               point[1] + 1
-            }号座位`
+            }号座位2`
           );
           isFounded = true;
-          break;
+          break loop;
+        } else {
+          this.#searchedSet.add(rSeat.join(""));
         }
       }
     } else {
       // 当数组为空时, 代表当前点已经越界, 直接返回false即可
       return isFounded;
     }
-
     // 八次遍历都没有找到待售票, 则针对八个点再进行一次遍历
     if (!isFounded) {
-      for (let i = 0; i < closestPoints.length; i++) {
-        if (this.reGenSeatByBFS(rArea, closestPoints)) {
+      loop: for (let i = 0; i < closestPoints.length; i++) {
+        const closestPoint = closestPoints[i];
+        if (this.reGenSeatByBFS([rArea, closestPoint[0], closestPoint[1]])) {
           isFounded = true;
-          break;
+          break loop;
         }
       }
     }
@@ -123,7 +136,11 @@ class Seat {
       // 下右
       [point[0] + 1, point[1] + 1],
     ];
-    return points.filter((v) => this.boundaryCheck(area, point));
+    return points.filter(
+      (v) =>
+        this.boundaryCheck(area, [v[0], v[1]]) &&
+        !this.#searchedSet.has([area, v[0], v[1]].join(""))
+    );
   }
 
   // 边界判断: 超出边界时为false
@@ -147,7 +164,8 @@ class Seat {
   }
 
   checkAllSoldOut() {
-    return this.#seatMap.every((v) => v.every((w) => w.every((x) => x)));
+    // return this.#seatMap.every((v) => v.every((w) => w.every((x) => x)));
+    return this.#sellingArea.length === 0;
   }
 }
 
