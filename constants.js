@@ -7,7 +7,7 @@ const SEAT_STEP_ADD = 2;
 // 总排数
 const TOTAL_ROW = (BACK_SEAT_NUM - FRONT_SEAT_NUM) / SEAT_STEP_ADD + 1;
 // 总区域
-const AREA_ARR = ['A', 'B', 'C', 'D']
+const AREA_ARR = ["A", "B", "C", "D"];
 // 总区域数
 const TOTAL_AREA = AREA_ARR.length;
 // 单次最大购票数量
