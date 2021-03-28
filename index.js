@@ -16,11 +16,11 @@ const main = async () => {
   if (option === WHICH_QUESTION_OPTIONS.buyTicket) {
     const userNum = await howManyUser();
     for (let i = 0; i < userNum; i++) {
-      const rPeople = randomPeople();
-      logger.info(
-        `第${totalUser + i + 1}位用户开始购票, 本次要买${rPeople}张票`
-      );
-      seat.buyTicket(rPeople);
+        const rPeople = randomPeople();
+        logger.info(
+          `第${totalUser + i + 1}位用户开始购票, 本次要买${rPeople}张票`
+        );
+        seat.buyTicket(rPeople);
     }
     totalUser += userNum;
   } else {

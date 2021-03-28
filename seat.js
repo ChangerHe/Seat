@@ -19,7 +19,6 @@ class Seat {
 
   #seatMap = [];
   #sellingArea = [0, 1, 2, 3];
-  #searchedSet = new Set();
   constructor() {
     logger.info("empty seats had been generated.");
     this.#seatMap = new Array(TOTAL_AREA).fill([]).map((v, i) => {
@@ -45,7 +44,8 @@ class Seat {
   }
 
   // 出票
-  outputTicket(rSeat) {
+  outputTicket(rSeat, num) {
+    let lastNum = num;
     const curSeatSellable = this.#seatMap[rSeat[0]][rSeat[1]][rSeat[2]];
     if (!curSeatSellable) {
       logger.info(
@@ -54,8 +54,10 @@ class Seat {
         }号座位`
       );
       this.#seatMap[rSeat[0]][rSeat[1]][rSeat[2]] = 1;
-    } else {
-      if (!this.reGenSeatByBFS(rSeat)) {
+      lastNum--;
+    }
+    if (lastNum > 0) {
+      if (!this.reGenSeatByBFS(rSeat, rSeat, lastNum)) {
         this.#sellingArea = this.#sellingArea.filter((v) => v !== rSeat[0]);
         if (this.#sellingArea.length) {
           this.outputTicket([
@@ -76,42 +78,48 @@ class Seat {
       return;
     }
     const rSeat = randomSeat();
-    for (let i = 0; i < rPeople; i++) {
-      this.outputTicket(rSeat);
-    }
+    this.outputTicket(rSeat, rPeople);
   }
 
   // 基于广度优先遍历重新生成座位
-  reGenSeatByBFS(seat, anchor) {
+  reGenSeatByBFS(seat, anchor, num) {
+    let lastNum = num;
     const area = seat[0];
     const point = [seat[1], seat[2]];
+    // 获取当前点位最邻近的待售票
     const closestPoints = this.getClosestPoint(seat, anchor);
+    // 是否最终找到待售票
     let isFounded = false;
     if (closestPoints.length) {
+      // 遍历周边点位
       loop: for (let i = 0; i < closestPoints.length; i++) {
         const p = closestPoints[i];
+        // 查看该点位是否处于待售状态
         if (this.forSaleCheck(area, p)) {
+          // 如果是, 则出售该点位的票
           this.#seatMap[area][p[0]][p[1]] = 1;
+          lastNum--;
           logger.info(
             `已售出: ${AREA_ARR[area]}区域的 ${p[0] + 1}排, ${
-              p[1] - TOTAL_ROW + p[0] + 1
-            }号座位2`
+              p[1] + 1 - TOTAL_ROW + p[0]
+            }号座位`
           );
-          isFounded = true;
-          break loop;
+          if (lastNum === 0) {
+            // 将当前轮次是否已经出票的状态置为true, 终止循环
+            isFounded = true;
+            break loop;
+          }
         }
       }
     } else {
       // 当数组为空时, 代表当前点已经越界, 直接返回false即可
       return isFounded;
     }
-    // 八次遍历都没有找到待售票, 则针对八个点再进行一次遍历
+    // N次遍历都没有找到待售票, 则针对八个点再进行一次遍历
     if (!isFounded) {
       loop: for (let i = 0; i < closestPoints.length; i++) {
-        const closestPoint = closestPoints[i];
-        if (
-          this.reGenSeatByBFS([area, closestPoint[0], closestPoint[1]], anchor)
-        ) {
+        const p = closestPoints[i];
+        if (this.reGenSeatByBFS([area, p[0], p[1]], [area, p[0], p[1]], lastNum)) {
           isFounded = true;
           break loop;
         }
@@ -126,14 +134,35 @@ class Seat {
     // 如果该点已经超出范畴, 则不再进行广度优先遍历
     if (!this.boundaryCheck(seat)) return [];
     const points = calcPoints(seat, anchor);
-    return points.filter((v) => {
-      return this.boundaryCheck([area, v[0], v[1]]);
-      // return (
-      //   !this.boundaryCheck([area, v[0], v[1]]) &&
-      //   this.#searchedSet.has([area, v[0], v[1]].join(""))
-      // );
-    });
+    return points.filter((v) => this.boundaryCheck([area, v[0], v[1]]));
   }
+
+  // getClosestPoint(seat, anchor) {
+  //   // 如果该点已经超出范畴, 则不再进行广度优先遍历
+  //   if (!this.boundaryCheck(seat)) return [];
+  //   const area = seat[0];
+  //   const point = [seat[1], seat[2]];
+  //   // 该点的上下左右八个点
+  //   const points = [
+  //     // 左
+  //     [point[0] - 1, point[1]],
+  //     // 右
+  //     [point[0] + 1, point[1]],
+  //     // 上左
+  //     [point[0] - 1, point[1] - 1],
+  //     // 上中
+  //     [point[0], point[1] - 1],
+  //     // 上右
+  //     [point[0] + 1, point[1] - 1],
+  //     // 下左
+  //     [point[0] - 1, point[1] + 1],
+  //     // 下中
+  //     [point[0], point[1] + 1],
+  //     // 下右
+  //     [point[0] + 1, point[1] + 1],
+  //   ];
+  //   return points.filter((v) => this.boundaryCheck([area, v[0], v[1]]));
+  // }
 
   // 边界判断: 超出边界时为false
   boundaryCheck(seat) {

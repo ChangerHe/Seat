@@ -2,13 +2,13 @@ const { TOTAL_ROW, BACK_SEAT_NUM } = require("../constants");
 
 // 方位
 const DIRECTIONS = {
+  top: "top",
+  bottom: "bottom",
   left: "left",
   right: "right",
   topLeft: "topLeft",
-  top: "top",
   topRight: "topRight",
   bottomLeft: "bottomLeft",
-  bottom: "bottom",
   bottomRight: "bottomRight",
 };
 
@@ -24,7 +24,7 @@ const excludeDirections = (...excludeArr) => {
 
 // 判断点所在的方位并计算点位
 const calcPoints = (target, anchor) => {
-  let points = Object.values(DIRECTIONS);
+  let points = DIRECTIONS_ARR;
   const curPoint = [target[1], target[2]];
   const pointsMap = {
     [DIRECTIONS.left]: [curPoint[0] - 1, curPoint[1]],
